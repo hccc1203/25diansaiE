@@ -191,7 +191,7 @@ def main():
         LED_G.low()
         LED_B.high()
 
-        message = bytes([0x7A,1,1,1,1,0x7B])
+        message = bytes([0x7A,1,1,1,1,1,0x7B])
         uart.write(message)
         while True:
             os.exitpoint()
