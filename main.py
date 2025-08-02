@@ -208,7 +208,7 @@ def main():
                         y=int(res["boxes"][i][1] )
                         w = int(float(res["boxes"][i][2] - res["boxes"][i][0]))
                         h = int(float(res["boxes"][i][3] - res["boxes"][i][1]) )
-                        print(res["scores"][i])在·
+                        print(res["scores"][i])
                         horizon_error = (int)(339 - (x + w/2));
                         vertical_error = (int)(y+h/2 - 260);
                         message = generate_uart_message(horizon_error,vertical_error)
