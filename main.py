@@ -19,6 +19,9 @@ from libs.AI2D import Ai2d
 import nncase_runtime as nn
 import aidemo
 
+Laser_x = 347
+Laser_y = 263
+
 #key = YbKey()
 #uart = YbUart(baudrate=115200)
 #最下面的tx
@@ -70,7 +73,7 @@ def generate_uart_message(x,y):
     x = max(0, min(255, x))
     y = max(0, min(255, y))
 
-    message = bytes([0x7A, int1, x, int2, y,1, 0x7B])
+    message = bytes([0x7A, int1, x, int2, y,1,0x7B])
 
     return bytes(message)
 
@@ -103,9 +106,6 @@ def line_intersection(line1, line2):
 def fabs(x):
     if x < 0:
         return -x
-
-
-
 
 def init_sensor():
     """初始化摄像头 / Initialize camera sensor"""
@@ -201,20 +201,20 @@ def main():
             flag = False
             if len(res["boxes"]):
                 for i in range(len(res["boxes"])):
-                    if(res["scores"][i] > 0.84):
+                    if(res["scores"][i] > 0.86):
                         flag = True
-                    if res["scores"][i] > 0.75:
+                    if res["scores"][i] > 0.78:
                         x=int(res["boxes"][i][0] )
                         y=int(res["boxes"][i][1] )
                         w = int(float(res["boxes"][i][2] - res["boxes"][i][0]))
                         h = int(float(res["boxes"][i][3] - res["boxes"][i][1]) )
                         print(res["scores"][i])
-                        horizon_error = (int)(339 - (x + w/2));
-                        vertical_error = (int)(y+h/2 - 260);
+                        horizon_error = (int)(Laser_x - (x + w/2));
+                        vertical_error = (int)(y+h/2 - Laser_y);
                         message = generate_uart_message(horizon_error,vertical_error)
                         uart.write(message)
                     else:
-                        message = bytes([0x7A,0,0,0,0,0x7B])
+                        message = bytes([0x7A,0,0,0,0,0,0x7B])
                         uart.write(message)
             else:
                 message = bytes([0x7A,0,0,0,0,0,0x7B])
@@ -248,7 +248,7 @@ def main():
             w = 0
             if len(res["boxes"]):
                 for i in range(len(res["boxes"])):
-                    if res["scores"][i] > 0.6:
+                    if res["scores"][i] > 0.82:
                         x=int(res["boxes"][i][0] )
                         y=int(res["boxes"][i][1] )
                         w = int(float(res["boxes"][i][2] - res["boxes"][i][0]))
@@ -297,7 +297,7 @@ def main():
                     l2=l2**(1/2)
                     #print(l2/l1)
 #                    if (l2/l1>0.65):
-                    if ((l2/l1>0.65) and  int(intersection[0]) > x and int(intersection[0]) < x+w and int(intersection[1]) > y and int(intersection[1]) < y+h) or l2/l1>0.72:#可调
+                    if ((l2/l1>0.68) and  int(intersection[0]) > x and int(intersection[0]) < x+w and int(intersection[1]) > y and int(intersection[1]) < y+h) or l2/l1>0.72:#可调
 #                        img.draw_rectangle(min_density_blob.rect(), color=(255,0,0))
 #                        img.draw_cross(min_density_blob.min_corners()[0][0], min_density_blob.min_corners()[0][1])
 #                        img.draw_cross(min_density_blob.min_corners()[1][0], min_density_blob.min_corners()[1][1])
@@ -309,8 +309,8 @@ def main():
                         img.draw_cross(x,y, color=(255,0,0))
                         img.draw_cross(x+w,y+h, color=(255,0,0))
                         print(intersection)#靶心坐标
-                        horizon_error = (int)(337 - intersection[0]);
-                        vertical_error = (int)(intersection[1] - 256);
+                        horizon_error = (int)(Laser_x - intersection[0]);
+                        vertical_error = (int)(intersection[1] - Laser_y);
                         print("横向误差",horizon_error)
                         print("纵向误差",vertical_error)
                         if(horizon_error < 15 and horizon_error > -15 and
@@ -322,8 +322,8 @@ def main():
                         message = generate_uart_message(horizon_error,vertical_error)
                         uart.write(message)
                     elif ai_flag:
-                        horizon_error = (int)(337 - (x + w/2));
-                        vertical_error = (int)(y+h/2 - 256);
+                        horizon_error = (int)(Laser_x - (x + w/2));
+                        vertical_error = (int)(y+h/2 - Laser_y);
                         message = generate_uart_message(horizon_error,vertical_error)
                         print("横向误差",horizon_error)
                         print("纵向误差",vertical_error)
